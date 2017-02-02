@@ -122,7 +122,7 @@ class Gateway extends AbstractGateway
             'Amount' => '',
             'PaytureId' => '',
             'CustomerKey'  => '',
-            'CustomFields' => ''
+            'CustomFields' => '',
         ];
     }
 
