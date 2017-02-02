@@ -1,0 +1,37 @@
+{
+  "name": "mzcoding/omnipay-payture",
+  "version": "1.0.0",
+  "type": "library",
+  "description": "Payture.com support for Omnipay payment processing library",
+  "keywords": [
+    "payture",
+    "payturecom",
+    "paymentgate",
+    "gateway",
+    "merchant",
+    "omnipay",
+    "pay",
+    "payment",
+    "purchase",
+    "soap"
+  ],
+  "homepage": "https://github.com/mzcoding/omnipay-payture",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Stanisalv Boyko",
+      "email": "mzcoding@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Omnipay\\PayTure\\": "src/"
+    }
+  },
+  "require": {
+    "omnipay/common": "^2.3"
+  },
+  "require-dev": {
+    "omnipay/tests": "^2.1"
+  }
+}
