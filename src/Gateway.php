@@ -2,6 +2,8 @@
 
 namespace Omnipay\Payture;
 
+use Guzzle\Http\ClientInterface;
+use Guzzle\Http\Client as HttpClient;
 use Omnipay\Common\AbstractGateway;
 
 /**
@@ -16,6 +18,17 @@ use Omnipay\Common\AbstractGateway;
  * @company BWA Group
  * @package Omnipay\Paytour
  * @link http://payture.com/integration/api/
+ *
+ * @method \Omnipay\Common\Message\RequestInterface authorize(array $options = array())
+ * @method \Omnipay\Common\Message\RequestInterface completeAuthorize(array $options = array())
+ * @method \Omnipay\Common\Message\RequestInterface capture(array $options = array())
+ * @method \Omnipay\Common\Message\RequestInterface purchase(array $options = array())
+ * @method \Omnipay\Common\Message\RequestInterface completePurchase(array $options = array())
+ * @method \Omnipay\Common\Message\RequestInterface refund(array $options = array())
+ * @method \Omnipay\Common\Message\RequestInterface void(array $options = array())
+ * @method \Omnipay\Common\Message\RequestInterface createCard(array $options = array())
+ * @method \Omnipay\Common\Message\RequestInterface updateCard(array $options = array())
+ * @method \Omnipay\Common\Message\RequestInterface deleteCard(array $options = array())
  */
 
 class Gateway extends AbstractGateway
@@ -25,7 +38,8 @@ class Gateway extends AbstractGateway
      *
      * @var string
      */
-    const HOST = 'widgeton';
+    const HOST = 'Menateka';
+
     /**
      * PTEST MODE
      *
@@ -104,6 +118,30 @@ class Gateway extends AbstractGateway
         'WRONG_USER_PARAMS' =>	'Пользователь с такими параметрами не найден'
     ];
 
+    public function __construct(ClientInterface $httpClient = null, HttpRequest $httpRequest = null) {
+        parent::__construct($httpClient, $httpRequest);
+    }
+
+    /**
+     * Create and initialize a request object
+     *
+     * This function is usually used to create objects of type
+     * Omnipay\Common\Message\AbstractRequest (or a non-abstract subclass of it)
+     * and initialise them with using existing parameters from this gateway.
+     *
+     * @see \Omnipay\Common\Message\AbstractRequest
+     * @param string $class The request class name
+     * @param array $parameters
+     * @return \Omnipay\Common\Message\AbstractRequest
+     * @throws \Omnipay\Common\Exception\RuntimeException
+     */
+    protected function createRequest($class, array $parameters)
+    {
+        $obj = new $class($this->httpClient, $this->httpRequest);
+        return $obj->initialize(array_replace($this->getParameters(), $parameters));
+    }
+
+
     /**
      * Get gateway display name
      *
@@ -113,6 +151,17 @@ class Gateway extends AbstractGateway
     {
         return 'PayToure';
     }
+
+    /**
+     * @return string
+     */
+    public function getUrl(){
+        return 'https://' . self::HOST .'.payture.com/api/Pay';
+    }
+
+    /**
+     * @return array
+     */
     public function getDefaultParameters()
     {
         return [
@@ -141,6 +190,10 @@ class Gateway extends AbstractGateway
             'Amount' => '1000'
         ];
     }
+
+    /**
+     * @return array
+     */
     public function getPayInfo()
     {
         return [
@@ -153,6 +206,18 @@ class Gateway extends AbstractGateway
             'Amount' => ''
         ];
     }
+    public function getOrderId()
+    {
+
+    }
+    public function getShopId()
+    {
+
+    }
+
+    /**
+     * @return array
+     */
     public function getCustomFields()
     {
          return [
@@ -173,6 +238,7 @@ class Gateway extends AbstractGateway
     }
 
     /**
+     * Test Mode for example
      * @return mixed
      */
     public function getTestMode()
@@ -180,10 +246,40 @@ class Gateway extends AbstractGateway
         return $this->getParameter('testMode');
     }
 
+    /**
+     * Returns endpoint address
+     *
+     * @return string
+     */
+    public function getEndpoint()
+    {
+        return $this->getParameter('endpoint');
+    }
+    /**
+     * Set endpoint address
+     *
+     * @param string $endpoint
+     * @return $this
+     */
+    public function setEndpoint($endpoint)
+    {
+        return $this->setParameter('endpoint', $endpoint);
+    }
+
     public function getInputs()
 
     {
 
+    }
+    public function payment()
+    {
+        $url = $this->getUrl();
+        $httpClient = new HttpClient();
+        if(self::TEST_MODE){
+            $testMode = $this->getPayInfoTest();
+            $result = $httpClient->request('POST', $url, $testMode);
+            dd($result);
+        }
     }
 
 }
