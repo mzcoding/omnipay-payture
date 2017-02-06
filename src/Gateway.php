@@ -3,8 +3,8 @@
 namespace Omnipay\Payture;
 
 use Guzzle\Http\ClientInterface;
-use Guzzle\Http\Client as HttpClient;
 use Omnipay\Common\AbstractGateway;
+use Omnipay\Payture\Message\RegisterRequest;
 
 /**
  * Class Gateway.
@@ -118,6 +118,8 @@ class Gateway extends AbstractGateway
         'WRONG_USER_PARAMS' =>	'Пользователь с такими параметрами не найден'
     ];
 
+
+
     public function __construct(ClientInterface $httpClient = null, HttpRequest $httpRequest = null) {
         parent::__construct($httpClient, $httpRequest);
     }
@@ -178,7 +180,7 @@ class Gateway extends AbstractGateway
     /**
      * @return array
      */
-    public function getPayInfoTest()
+    public function getPayInfoTest($amount)
     {
         return [
             'PAN' => '4111111111111112',
@@ -187,7 +189,7 @@ class Gateway extends AbstractGateway
             'CardHolder' => 'Test',
             'SecureCode' => '123',
             'OrderId' => md5(rand(1000, 7000)),
-            'Amount' => '1000'
+            'Amount' => $amount
         ];
     }
 
@@ -220,10 +222,10 @@ class Gateway extends AbstractGateway
      */
     public function getCustomFields()
     {
-         return [
-             'IP' => '',
-             'Description' => ''
-         ];
+        return [
+            'IP' => '',
+            'Description' => ''
+        ];
     }
     /**
      * Set gateway test mode. Also changes URL
@@ -266,20 +268,25 @@ class Gateway extends AbstractGateway
         return $this->setParameter('endpoint', $endpoint);
     }
 
-    public function getInputs()
 
-    {
-
-    }
-    public function payment()
+    public function payment(array $data)
     {
         $url = $this->getUrl();
-        $httpClient = new HttpClient();
+        $data['url'] = $url;
+
         if(self::TEST_MODE){
-            $testMode = $this->getPayInfoTest();
-            $result = $httpClient->request('POST', $url, $testMode);
-            dd($result);
+            $modeData = $this->getPayInfoTest($data['amount']);
+            $data['card'] = $modeData;
         }
+
+
+        return $this->register($data);
+
     }
+    public function register(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\Payture\Message\RegisterRequest', $parameters);
+    }
+
 
 }
