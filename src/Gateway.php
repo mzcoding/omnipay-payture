@@ -16,7 +16,7 @@ use Omnipay\Payture\Message\RegisterRequest;
  *
  * @author Stanislav Boyko (mzcoding)
  * @company BWA Group
- * @package Omnipay\Paytour
+ * @package Omnipay\Payture
  * @link http://payture.com/integration/api/
  *
  * @method \Omnipay\Common\Message\RequestInterface authorize(array $options = array())

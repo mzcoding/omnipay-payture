@@ -25,7 +25,7 @@
   ],
   "autoload": {
     "psr-4": {
-      "Omnipay\\PayTure\\": "src/"
+      "Omnipay\\Payture\\": "src/"
     }
   },
   "require": {
