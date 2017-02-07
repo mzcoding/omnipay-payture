@@ -5,6 +5,7 @@ namespace Omnipay\Payture;
 use Guzzle\Http\ClientInterface;
 use Omnipay\Common\AbstractGateway;
 use Omnipay\Payture\Message\RegisterRequest;
+use Symfony\Component\HttpFoundation\Request as HttpRequest;
 
 /**
  * Class Gateway.
@@ -151,14 +152,23 @@ class Gateway extends AbstractGateway
      */
     public function getName()
     {
-        return 'PayToure';
+        return 'Paytoure';
+    }
+
+    /**
+     * @param $url
+     * @return $this
+     */
+    public function setUrl($url)
+    {
+       return $this->setParameter('url', $url);
     }
 
     /**
      * @return string
      */
     public function getUrl(){
-        return 'https://' . self::HOST .'.payture.com/api/Pay';
+        return $this->getParameter('url');
     }
 
     /**
@@ -208,13 +218,64 @@ class Gateway extends AbstractGateway
             'Amount' => ''
         ];
     }
+
+    /**
+     * @param $amount
+     * @return $this
+     */
+    public function setAmount($amount)
+    {
+        return $this->setParameter('Amount', $amount);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAmount()
+    {
+        return $this->getParameter('Amount');
+    }
+
+    /**
+     * @param $key
+     * @return $this
+     */
+    public function setKey($key)
+    {
+        return $this->setParameter('Key', $key);
+    }
+    public function getKey()
+    {
+        return $this->getParameter('Key');
+    }
+
+    public function setCurrency($currency)
+    {
+        return $this->setParameter('Currency', $currency);
+    }
+    public function getCurrency()
+    {
+        return $this->getParameter('Currency');
+    }
+
+
+    public function  setOrderId($orderId)
+    {
+       return $this->setParameter('OrderId', $orderId);
+    }
     public function getOrderId()
     {
-
+        return $this->getParameter('OrderId');
     }
-    public function getShopId()
-    {
 
+
+    public function setPaymentInfo($payInfo)
+    {
+        return $this->setParameter('PayInfo', $payInfo);
+    }
+    public function getPaymentInfo()
+    {
+        return $this->getParameter('PayInfo');
     }
 
     /**
@@ -269,23 +330,22 @@ class Gateway extends AbstractGateway
     }
 
 
-    public function payment(array $data)
+   /* public function sendTest(array $data = array())
     {
         $url = $this->getUrl();
-        $data['url'] = $url;
+        $amount = isset($data['amount'])  ? $data['amount'] : $this->getAmount();
 
         if(self::TEST_MODE){
-            $modeData = $this->getPayInfoTest($data['amount']);
+            $modeData = $this->getPayInfoTest($amount);
             $data['card'] = $modeData;
         }
 
+       return $this;
 
-        return $this->register($data);
-
-    }
+    }*/
     public function register(array $parameters = array())
     {
-        return $this->createRequest('\Omnipay\Payture\Message\RegisterRequest', $parameters);
+      return $this->createRequest('\Omnipay\Payture\Message\RegisterRequest', $parameters);
     }
 
 

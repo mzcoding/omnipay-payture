@@ -2,6 +2,8 @@
 
 use Guzzle\Http\ClientInterface;
 use Omnipay\Common\Message\AbstractRequest;
+use Omnipay\Payture\Message\RegisterResponse;
+use Symfony\Component\HttpFoundation\Request as HttpRequest;
 
 class RegisterRequest extends AbstractRequest
 {
@@ -17,6 +19,8 @@ class RegisterRequest extends AbstractRequest
 
 
 
+
+
     /**
      * Get the raw data array for this message. The format of this varies from gateway to
      * gateway, but will usually be either an associative array, or a SimpleXMLElement.
@@ -25,31 +29,22 @@ class RegisterRequest extends AbstractRequest
      */
     public function getData()
     {
-        dd($this->getParameters());
+
         $data = [
-            'Key' => 'Merchant',
-            'Amount' => '',
-            'PayInfo' => ''
+            'Url' => $this->getParameter('url'),
+            'Key' => $this->getParameter('Key'),
+            'Amount' => $this->getParameter('Amount'),
+            'OrderId' => $this->getParameter('OrderId'),
+            'PayInfo' => $this->getParameter('PayInfo')
         ];
 
-        /*      curl https://sandbox.payture.com/api/Pay \
-      -d Key=Merchant \
-          -d Amount=100 \
-          -d OrderId=525725426015165144660440452620726054 \
-          --data-urlencode "PayInfo= \
-      PAN=4111111111111112; \
-      EMonth=3; \
-      EYear=19; \
-      CardHolder=Ivan Ivanov; \
-      SecureCode=123; \
-      OrderId=525725426015165144660440452620726054; \
-      Amount=100;" \
-          --data-urlencode "CustomFields = \
-      OrderId=7.2.236.72; \
-      Product=ticket;" \*/
+        return $data;
     }
     public function sendData($data)
     {
         $data = $this->getData();
+        $this->response = new RegisterResponse($this, parent::sendData($data));
+
+        return $this->response;
     }
 }
