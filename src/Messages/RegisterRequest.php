@@ -18,9 +18,6 @@ class RegisterRequest extends AbstractRequest
     }
 
 
-
-
-
     /**
      * Get the raw data array for this message. The format of this varies from gateway to
      * gateway, but will usually be either an associative array, or a SimpleXMLElement.
@@ -29,22 +26,63 @@ class RegisterRequest extends AbstractRequest
      */
     public function getData()
     {
-
         $data = [
-            'Url' => $this->getParameter('url'),
             'Key' => $this->getParameter('Key'),
-            'Amount' => $this->getParameter('Amount'),
-            'OrderId' => $this->getParameter('OrderId'),
-            'PayInfo' => $this->getParameter('PayInfo')
+            'Data' => $this->getParameter('Data')
         ];
 
         return $data;
     }
+
+    /**
+     * @param mixed $data
+     * @return \Omnipay\Common\Message\ResponseInterface|\Omnipay\Payture\Message\RegisterResponse
+     */
     public function sendData($data)
     {
-        $data = $this->getData();
-        $this->response = new RegisterResponse($this, parent::sendData($data));
+        $objXML = $this->curlTest($data);
+        /*$reqest = $this->httpClient->post($this->getParameter('url'));
+        $reqest->setBody($data);
+        $response = $reqest->send();*/
+        dd($objXML);
+
+
+        $this->response = new RegisterResponse($this, $data);
 
         return $this->response;
+    }
+
+    /**
+     * @param array $data
+     * @return bool|\SimpleXMLElement
+     */
+    public function curlTest(array $data)
+    {
+        $requestData = "";
+        foreach($data as $key => $value){
+            $requestData .=  $key."=".$value."&";
+        }
+
+
+        if( $curl = curl_init() ) {
+            curl_setopt($curl, CURLOPT_URL, $this->getParameter('url'));
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
+            curl_setopt($curl, CURLOPT_POST, true);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $requestData);
+            $out = curl_exec($curl);
+
+            if($out !== false) {
+
+                $xml = new \SimpleXMLElement($out);
+
+                curl_close($curl);
+
+                return $xml;
+            }
+            curl_close($curl);
+
+        }
+
+        return false;
     }
 }

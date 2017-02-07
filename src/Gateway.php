@@ -279,6 +279,127 @@ class Gateway extends AbstractGateway
     }
 
     /**
+     * @param $sessionType
+     * @return $this
+     */
+    public function setSessionType($sessionType)
+    {
+        return $this->setParameter('SessionType', $sessionType);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSessionType()
+    {
+        return $this->getParameter('SessionType');
+    }
+
+    /**
+     * @param $ip
+     * @return $this
+     */
+    public function setIp($ip)
+    {
+        return $this->setParameter('Ip', $ip);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIp()
+    {
+        return $this->getParameter('Ip');
+    }
+    public function setCallbackUrl($callback_url)
+    {
+        return $this->setParameter('CallbackUrl', $callback_url);
+    }
+    public function getCallbackUrl()
+    {
+        return $this->getParameter('CallbackUrl');
+    }
+    public function setTemplateTag($templateTeg)
+    {
+        return $this->setParameter('TemplateTag', $templateTeg);
+    }
+    public function getTemplateTag()
+    {
+        return $this->getParameter('TemplateTag');
+    }
+    public function setLanguage($language)
+    {
+        return $this->setParameter('Language', $language);
+    }
+    public function getLanguage()
+    {
+        return $this->getParameter('Language');
+    }
+    public function setProduct($product)
+    {
+        return $this->setParameter('Product', $product);
+    }
+    public function getProduct()
+    {
+        return $this->getParameter('Product');
+    }
+
+    /**
+     * @param $total
+     * @return $this
+     */
+    public function setTotal($total)
+    {
+        return $this->setParameter('Total', $total);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTotal()
+    {
+        return $this->getParameter('Total');
+    }
+
+    /**
+     * @param array $params
+     * @return string
+     */
+    private function initDataPay(array $params = array())
+    {
+        if(!$this->getIp()) $this->setIp($this->getRealIP());
+
+        if(empty($params)){
+            $params = [
+               'SessionType='.$this->getSessionType(),
+               'OrderId='. $this->getOrderId(),
+               'Amount='.$this->getAmount(),
+               'IP='.$this->getIp()
+            ];
+
+            if($this->getCallbackUrl()){
+                $params[] = 'Url='.$this->getCallbackUrl();
+            }
+            if($this->getTemplateTag()){
+                $params[] = 'TemplateTag='.$this->getTemplateTag();
+            }
+            if($this->getLanguage()){
+                $params[] = 'Language='.$this->getLanguage();
+            }
+            if($this->getProduct()){
+                $params[] = 'Product='.$this->getProduct();
+            }
+            if($this->getTotal()){
+                $params[] = 'Total='.$this->getTotal();
+            }
+        }
+        $params = urlencode(implode(';',$params));
+
+        $this->setParameter('Data', $params);
+
+    }
+
+    /**
      * @return array
      */
     public function getCustomFields()
@@ -330,22 +451,38 @@ class Gateway extends AbstractGateway
     }
 
 
-   /* public function sendTest(array $data = array())
-    {
-        $url = $this->getUrl();
-        $amount = isset($data['amount'])  ? $data['amount'] : $this->getAmount();
-
-        if(self::TEST_MODE){
-            $modeData = $this->getPayInfoTest($amount);
-            $data['card'] = $modeData;
+    /**
+     * @return string
+     */
+    public function getRealIP(){
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])){//check ip from share internet
+            return $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])){ //to check ip is pass from proxy
+            return $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } elseif(!empty($_SERVER['REMOTE_ADDR'])) {
+            return $_SERVER['REMOTE_ADDR'];
         }
 
-       return $this;
+        return '127.0.0.1';
+    }
 
-    }*/
+    /**
+     * @param array $parameters
+     * @return \Omnipay\Common\Message\AbstractRequest
+     */
     public function register(array $parameters = array())
     {
+      $this->initDataPay();
       return $this->createRequest('\Omnipay\Payture\Message\RegisterRequest', $parameters);
+    }
+
+    /**
+     * @param array $parameters
+     * @return \Omnipay\Common\Message\AbstractRequest
+     */
+    public function payment(array $parameters = array())
+    {
+        return $this->createRequest('\Omnipay\Payture\Message\PaymentRequest', $parameters);
     }
 
 
