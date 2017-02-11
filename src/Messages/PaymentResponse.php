@@ -9,6 +9,7 @@ use Omnipay\Common\Message\RequestInterface;
 class PaymentResponse extends AbstractResponse  implements RedirectResponseInterface
 {
 
+    public $redirectTo = '';
     /**
      * Gets the redirect target url.
      *
@@ -16,7 +17,7 @@ class PaymentResponse extends AbstractResponse  implements RedirectResponseInter
      */
     public function getRedirectUrl()
     {
-        // TODO: Implement getRedirectUrl() method.
+       return $this->redirectTo;
     }
 
     /**
@@ -46,6 +47,22 @@ class PaymentResponse extends AbstractResponse  implements RedirectResponseInter
      */
     public function isSuccessful()
     {
-        // TODO: Implement isSuccessful() method.
+        if($this->redirectTo) return false;
+
+        return true;
+    }
+    public function isRedirect()
+    {
+        if($this->redirectTo) return true;
+
+        return false;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getHtml()
+    {
+        return $this->data;
     }
 }

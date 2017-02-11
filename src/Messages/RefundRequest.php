@@ -1,23 +1,12 @@
 <?php namespace Omnipay\Payture\Message;
 
-use Guzzle\Http\ClientInterface;
-use League\Flysystem\Exception;
 use Omnipay\Common\Message\AbstractRequest;
-use Omnipay\Payture\Message\RegisterResponse;
-use Symfony\Component\HttpFoundation\Request as HttpRequest;
+use Omnipay\Common\Message\ResponseInterface;
+use Omnipay\Payture\Message\RefundResponse;
 
-class RegisterRequest extends AbstractRequest
+
+class RefundRequest extends AbstractRequest
 {
-    /**
-     * RegisterRequest constructor.
-     * @param ClientInterface $httpClient
-     * @param HttpRequest $httpRequest
-     */
-    public function __construct(ClientInterface $httpClient, HttpRequest $httpRequest)
-    {
-        parent::__construct($httpClient, $httpRequest);
-    }
-
 
     /**
      * Get the raw data array for this message. The format of this varies from gateway to
@@ -29,42 +18,27 @@ class RegisterRequest extends AbstractRequest
     {
         $data = [
             'Key' => $this->getParameter('Key'),
-            'Data' => $this->getParameter('Data')
+            'Password' => $this->getParameter('Password'),
+            'OrderId' => $this->getParameter('OrderId'),
+            'Amount' => $this->getParameter('Amount')
         ];
 
         return $data;
     }
 
     /**
-     * @param mixed $data
-     * @return \Omnipay\Common\Message\ResponseInterface|\Omnipay\Payture\Message\RegisterResponse
+     * Send the request with specified data
+     *
+     * @param  mixed $data The data to send
+     * @return ResponseInterface
      */
     public function sendData($data)
     {
-        $objXML = $this->curlTest($data);
-        /*$reqest = $this->httpClient->post($this->getParameter('url'));
-        $reqest->setBody($data);
-        $response = $reqest->send();*/
-        unset($data);
-        if($objXML) {
-           if($objXML['Success'] == "False"){
-               throw new \Exception($objXML['ErrCode']);
-           }
-
-
-           $data['Amount'] = $objXML['Amount'];
-           $data['SessionId'] = $objXML['SessionId'];
-           $data['OrderId'] = $objXML['OrderId'];
-        }else{
-            $data = false;
-        }
-
-
-        $this->response = new RegisterResponse($this, $data);
+        $resultResponse = $this->curlTest($data);
+        $this->response = new RefundResponse($this, $resultResponse);
 
         return $this->response;
     }
-
     /**
      * @param array $data
      * @return bool|\SimpleXMLElement

@@ -16,6 +16,10 @@ class RegisterResponse extends AbstractResponse  implements RedirectResponseInte
     {
         return is_array($this->data);
     }
+    public function getData()
+    {
+        return $this->data;
+    }
     /**
      * Does the response require a redirect?
      *
@@ -62,16 +66,7 @@ class RegisterResponse extends AbstractResponse  implements RedirectResponseInte
         return false;
     }
 
-    /**
-     * Get the raw data array for this message. The format of this varies from gateway to
-     * gateway, but will usually be either an associative array, or a SimpleXMLElement.
-     *
-     * @return mixed
-     */
-    public function getData()
-    {
-        return $this->getData();
-    }
+
 
     /**
      * Perform the required redirect.

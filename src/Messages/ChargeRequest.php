@@ -1,12 +1,11 @@
 <?php namespace Omnipay\Payture\Message;
 
 use Guzzle\Http\ClientInterface;
-use League\Flysystem\Exception;
 use Omnipay\Common\Message\AbstractRequest;
-use Omnipay\Payture\Message\RegisterResponse;
-use Symfony\Component\HttpFoundation\Request as HttpRequest;
+use Omnipay\Payture\Message\ChargeResponse;
+use Omnipay\Common\Message\ResponseInterface;
 
-class RegisterRequest extends AbstractRequest
+class ChargeRequest extends AbstractRequest
 {
     /**
      * RegisterRequest constructor.
@@ -17,8 +16,6 @@ class RegisterRequest extends AbstractRequest
     {
         parent::__construct($httpClient, $httpRequest);
     }
-
-
     /**
      * Get the raw data array for this message. The format of this varies from gateway to
      * gateway, but will usually be either an associative array, or a SimpleXMLElement.
@@ -28,43 +25,28 @@ class RegisterRequest extends AbstractRequest
     public function getData()
     {
         $data = [
-            'Key' => $this->getParameter('Key'),
-            'Data' => $this->getParameter('Data')
+            'Key'   => $this->getParameter('Key'),
+            'Password' => $this->getParameter('Password'),
+            'SessionId' => $this->getParameter('SessionId')
         ];
+        if($this->getParameter('Amount')) $data['Amount'] = $this->getParameter('Amount');
 
         return $data;
     }
 
     /**
-     * @param mixed $data
-     * @return \Omnipay\Common\Message\ResponseInterface|\Omnipay\Payture\Message\RegisterResponse
+     * Send the request with specified data
+     *
+     * @param  mixed $data The data to send
+     * @return ResponseInterface
      */
     public function sendData($data)
     {
-        $objXML = $this->curlTest($data);
-        /*$reqest = $this->httpClient->post($this->getParameter('url'));
-        $reqest->setBody($data);
-        $response = $reqest->send();*/
-        unset($data);
-        if($objXML) {
-           if($objXML['Success'] == "False"){
-               throw new \Exception($objXML['ErrCode']);
-           }
-
-
-           $data['Amount'] = $objXML['Amount'];
-           $data['SessionId'] = $objXML['SessionId'];
-           $data['OrderId'] = $objXML['OrderId'];
-        }else{
-            $data = false;
-        }
-
-
-        $this->response = new RegisterResponse($this, $data);
+        $resultResponse = $this->curlTest($data);
+        $this->response = new ChargeResponse($this, $resultResponse);
 
         return $this->response;
     }
-
     /**
      * @param array $data
      * @return bool|\SimpleXMLElement
@@ -84,16 +66,10 @@ class RegisterRequest extends AbstractRequest
             curl_setopt($curl, CURLOPT_POSTFIELDS, $requestData);
             $out = curl_exec($curl);
 
-            if($out !== false) {
 
-                $xml = new \SimpleXMLElement($out);
 
-                curl_close($curl);
-
-                return $xml;
-            }
             curl_close($curl);
-
+            return $out;
         }
 
         return false;

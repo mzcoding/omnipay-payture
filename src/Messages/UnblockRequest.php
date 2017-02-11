@@ -1,22 +1,11 @@
 <?php namespace Omnipay\Payture\Message;
 
-use Guzzle\Http\ClientInterface;
 use Omnipay\Common\Message\AbstractRequest;
+use Omnipay\Payture\Message\UnblockResponse;
 use Omnipay\Common\Message\ResponseInterface;
-use Omnipay\Payture\Message\PaymentResponse;
-use Symfony\Component\HttpFoundation\Request as HttpRequest;
 
-class PaymentRequest extends AbstractRequest
+class UnblockRequest extends AbstractRequest
 {
-    /**
-     * RegisterRequest constructor.
-     * @param ClientInterface $httpClient
-     * @param HttpRequest $httpRequest
-    */
-    public function __construct(ClientInterface $httpClient, HttpRequest $httpRequest)
-    {
-        parent::__construct($httpClient, $httpRequest);
-    }
 
     /**
      * Get the raw data array for this message. The format of this varies from gateway to
@@ -27,7 +16,11 @@ class PaymentRequest extends AbstractRequest
     public function getData()
     {
         $data = [
-           'SessionId' => $this->getParameter('SessionId')
+            'Key' => $this->getParameter('Key'),
+            'Password' => $this->getParameter('Password'),
+            'OrderId' => $this->getParameter('OrderId'),
+            'Amount'  => $this->getParameter('Amount')
+
         ];
 
         return $data;
@@ -41,10 +34,8 @@ class PaymentRequest extends AbstractRequest
      */
     public function sendData($data)
     {
-
-        $objHtml = $this->curlTest($data);
-        $this->response = new PaymentResponse($this, $objHtml);
-        $this->response->redirectTo = $this->getParameter('RedirectUrl');
+        $resultResponse = $this->curlTest($data);
+        $this->response = new UnblockResponse($this, $resultResponse);
 
         return $this->response;
     }
