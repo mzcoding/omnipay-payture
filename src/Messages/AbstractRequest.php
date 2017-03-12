@@ -1,64 +1,19 @@
 <?php
-
-namespace Omnipay\Payture;
-
-
-use Omnipay\Common\AbstractGateway;
-
-
 /**
- * Class Gateway.
- *
- * Works with Paytoure.ru gateway.
- * Supports test mode.
- * Implemented all methods from provided pdf instead of adding a card to SSL list
- * and payment through external payment system
- *
- * @author Stanislav Boyko (mzcoding)
- * @company BWA Group
- * @package Omnipay\Payture
- * @link http://payture.com/integration/api/
- *
- * @method \Omnipay\Common\Message\RequestInterface authorize(array $options = array())
- * @method \Omnipay\Common\Message\RequestInterface completeAuthorize(array $options = array())
- * @method \Omnipay\Common\Message\RequestInterface capture(array $options = array())
- * @method \Omnipay\Common\Message\RequestInterface purchase(array $options = array())
- * @method \Omnipay\Common\Message\RequestInterface completePurchase(array $options = array())
- * @method \Omnipay\Common\Message\RequestInterface refund(array $options = array())
- * @method \Omnipay\Common\Message\RequestInterface void(array $options = array())
- * @method \Omnipay\Common\Message\RequestInterface createCard(array $options = array())
- * @method \Omnipay\Common\Message\RequestInterface updateCard(array $options = array())
- * @method \Omnipay\Common\Message\RequestInterface deleteCard(array $options = array())
- */
+* http://mzcodig.com
+ **/
+namespace Omnipay\Payture\Message;
 
-class Gateway extends AbstractGateway
+
+class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 {
-
-    /**
-     * PTEST MODE
-     *
-     * @var boolean
-     */
-    const TEST_MODE = true;
-
-
-    /**
-     * Get gateway display name
-     *
-     * This can be used by carts to get the display name for each gateway.
-     */
-    public function getName()
-    {
-        return 'Paytoure';
-    }
-
     /**
      * @param $url
      * @return $this
      */
     public function setUrl($url)
     {
-       return $this->setParameter('Url', $url);
+        return $this->setParameter('Url', $url);
     }
 
     /**
@@ -67,26 +22,6 @@ class Gateway extends AbstractGateway
     public function getUrl(){
         return $this->getParameter('Url');
     }
-
-    /**
-     * @return array
-     */
-    public function getDefaultParameters()
-    {
-        return [
-            'Key' => '',
-            'PayInfo' => '',
-            'OrderId' => '',
-            'Amount' => '',
-            'PaytureId' => '',
-            'CustomerKey'  => '',
-            'CustomFields' => '',
-        ];
-    }
-
-
-
-
     /**
      * @param $amount
      * @return $this
@@ -137,15 +72,13 @@ class Gateway extends AbstractGateway
     {
         return $this->getParameter('Currency');
     }
-
-
     /**
      * @param $orderId
      * @return $this
      */
     public function  setOrderId($orderId)
     {
-       return $this->setParameter('OrderId', $orderId);
+        return $this->setParameter('OrderId', $orderId);
     }
 
     /**
@@ -190,7 +123,6 @@ class Gateway extends AbstractGateway
     {
         return $this->getParameter('SessionType');
     }
-
     /**
      * @param $session_id
      * @return $this
@@ -233,13 +165,12 @@ class Gateway extends AbstractGateway
     {
         return $this->setParameter('RedirectUrl', $redirect_url);
     }
-
     /**
      * @return mixed
      */
     public function getRedirectUrl()
     {
-       return $this->getParameter('RedirectUrl');
+        return $this->getParameter('RedirectUrl');
     }
 
 
@@ -328,7 +259,6 @@ class Gateway extends AbstractGateway
     {
         return $this->getParameter('Total');
     }
-
     /**
      * @param $password
      * @return $this
@@ -353,10 +283,10 @@ class Gateway extends AbstractGateway
     {
         if(empty($params)){
             $params = [
-               'SessionType='.$this->getSessionType(),
-               'OrderId='. $this->getOrderId(),
-               'Amount='.$this->getAmount(),
-               'IP='.$this->getIp()
+                'SessionType='.$this->getSessionType(),
+                'OrderId='. $this->getOrderId(),
+                'Amount='.$this->getAmount(),
+                'IP='.$this->getIp()
             ];
 
             if($this->getCallbackUrl()){
@@ -389,8 +319,6 @@ class Gateway extends AbstractGateway
     {
         return $this->getParameter('Data');
     }
-
-
     /**
      * Set gateway test mode. Also changes URL
      *
@@ -412,64 +340,6 @@ class Gateway extends AbstractGateway
         return $this->getParameter('testMode');
     }
 
-
-
-
-
-
-    /**
-     * @param array $parameters
-     * @return \Omnipay\Common\Message\AbstractRequest
-     */
-    public function register(array $parameters = array())
-    {
-      return $this->createRequest('\Omnipay\Payture\Message\RegisterRequest', $parameters);
-    }
-
-    /**
-     * @param array $parameters
-     * @return \Omnipay\Common\Message\AbstractRequest
-     */
-    public function payment(array $parameters = array())
-    {
-        return $this->createRequest('\Omnipay\Payture\Message\PaymentRequest', $parameters);
-    }
-
-    /**
-     * @param array $parameters
-     * @return \Omnipay\Common\Message\AbstractRequest
-     */
-    public function charge(array $parameters = array())
-    {
-        return $this->createRequest('\Omnipay\Payture\Message\ChargeRequest', $parameters);
-    }
-
-    /**
-     * @param array $parameters
-     * @return \Omnipay\Common\Message\AbstractRequest
-     */
-    public function unblock(array $parameters = array())
-    {
-        return $this->createRequest('\Omnipay\Payture\Message\UnblockRequest', $parameters);
-    }
-
-    /**
-     * @param array $parameters
-     * @return \Omnipay\Common\Message\AbstractRequest
-     */
-    public function payrefund(array $parameters = array())
-    {
-        return $this->createRequest('\Omnipay\Payture\Message\RefundRequest', $parameters);
-    }
-
-    /**
-     * @param array $parameters
-     * @return \Omnipay\Common\Message\AbstractRequest
-     */
-    public function status(array $parameters = array())
-    {
-        return $this->createRequest('\Omnipay\Payture\Message\PayStatusRequest', $parameters);
-    }
 
 
 }

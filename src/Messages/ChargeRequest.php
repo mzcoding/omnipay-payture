@@ -1,7 +1,7 @@
 <?php namespace Omnipay\Payture\Message;
 
 use Guzzle\Http\ClientInterface;
-use Omnipay\Common\Message\AbstractRequest;
+use Omnipay\Payture\Message\AbstractRequest;
 use Omnipay\Payture\Message\ChargeResponse;
 use Omnipay\Common\Message\ResponseInterface;
 

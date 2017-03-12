@@ -1,22 +1,10 @@
 <?php namespace Omnipay\Payture\Message;
 
-use Guzzle\Http\ClientInterface;
-use League\Flysystem\Exception;
-use Omnipay\Common\Message\AbstractRequest;
-use Omnipay\Payture\Message\RegisterResponse;
-use Symfony\Component\HttpFoundation\Request as HttpRequest;
+use Omnipay\Payture\Message\AbstractRequest;
 
 class RegisterRequest extends AbstractRequest
 {
-    /**
-     * RegisterRequest constructor.
-     * @param ClientInterface $httpClient
-     * @param HttpRequest $httpRequest
-     */
-    public function __construct(ClientInterface $httpClient, HttpRequest $httpRequest)
-    {
-        parent::__construct($httpClient, $httpRequest);
-    }
+
 
 
     /**
@@ -27,6 +15,7 @@ class RegisterRequest extends AbstractRequest
      */
     public function getData()
     {
+
         $data = [
             'Key' => $this->getParameter('Key'),
             'Data' => $this->getParameter('Data')
@@ -35,16 +24,16 @@ class RegisterRequest extends AbstractRequest
         return $data;
     }
 
-    /**
-     * @param mixed $data
-     * @return \Omnipay\Common\Message\ResponseInterface|\Omnipay\Payture\Message\RegisterResponse
-     */
+
     public function sendData($data)
     {
         $objXML = $this->curlTest($data);
-        /*$reqest = $this->httpClient->post($this->getParameter('url'));
+
+
+       /* $reqest = $this->httpClient->post($this->getParameter('url'));
         $reqest->setBody($data);
         $response = $reqest->send();*/
+
         unset($data);
         if($objXML) {
            if($objXML['Success'] == "False"){
@@ -98,4 +87,6 @@ class RegisterRequest extends AbstractRequest
 
         return false;
     }
+
+
 }
