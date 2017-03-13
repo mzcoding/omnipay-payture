@@ -5,7 +5,7 @@
 namespace Omnipay\Payture\Message;
 
 
-class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
+abstract class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
 {
     /**
      * @param $url
@@ -275,50 +275,7 @@ class AbstractRequest extends \Omnipay\Common\Message\AbstractRequest
     {
         return $this->getParameter('Password');
     }
-    /**
-     * @param array $params
-     * @return string
-     */
-    public function setInitDataPay(array $params = array())
-    {
-        if(empty($params)){
-            $params = [
-                'SessionType='.$this->getSessionType(),
-                'OrderId='. $this->getOrderId(),
-                'Amount='.$this->getAmount(),
-                'IP='.$this->getIp()
-            ];
 
-            if($this->getCallbackUrl()){
-                $params[] = 'Url='.$this->getCallbackUrl();
-            }
-            if($this->getTemplateTag()){
-                $params[] = 'TemplateTag='.$this->getTemplateTag();
-            }
-            if($this->getLanguage()){
-                $params[] = 'Language='.$this->getLanguage();
-            }
-            if($this->getProduct()){
-                $params[] = 'Product='.$this->getProduct();
-            }
-            if($this->getTotal()){
-                $params[] = 'Total='.$this->getTotal();
-            }
-        }
-        $params = urlencode(implode(';',$params));
-
-
-        return $this->setParameter('Data', $params);
-
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getInitDataPay()
-    {
-        return $this->getParameter('Data');
-    }
     /**
      * Set gateway test mode. Also changes URL
      *

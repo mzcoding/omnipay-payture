@@ -1,8 +1,8 @@
 <?php namespace Omnipay\Payture\Message;
 
 use Omnipay\Common\Message\AbstractResponse;
-use Omnipay\Common\Message\RedirectResponseInterface;
 use Omnipay\Common\Message\RequestInterface;
+use Omnipay\Common\Message\RedirectResponseInterface;
 
 class RegisterResponse extends AbstractResponse  implements RedirectResponseInterface
 {
@@ -14,7 +14,7 @@ class RegisterResponse extends AbstractResponse  implements RedirectResponseInte
      */
     public function isSuccessful()
     {
-        return is_array($this->data);
+        return true;
     }
     public function getData()
     {
@@ -36,7 +36,10 @@ class RegisterResponse extends AbstractResponse  implements RedirectResponseInte
      */
     public function getRedirectUrl()
     {
-        return "{$this->data['redirect_url']}?session={$this->data['session']}";
+        $data = $this->getData();
+        $paymentUrl = $data['Url'];
+
+        return $paymentUrl;
     }
     /**
      * Gateway Reference
@@ -54,7 +57,7 @@ class RegisterResponse extends AbstractResponse  implements RedirectResponseInte
      */
     public function getRedirectMethod()
     {
-        return 'GET';
+        return 'POST';
     }
     /**
      * Gets the redirect form data array, if the redirect method is POST.
@@ -63,7 +66,11 @@ class RegisterResponse extends AbstractResponse  implements RedirectResponseInte
      */
     public function getRedirectData()
     {
-        return false;
+        $data = $this->getData();
+        return [
+            'Key' => $data['Key'],
+            'Data' => $data['Data']
+        ];
     }
 
 
@@ -117,4 +124,5 @@ class RegisterResponse extends AbstractResponse  implements RedirectResponseInte
     {
         return $this->getCode();
     }
+
 }

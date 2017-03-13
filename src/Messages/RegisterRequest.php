@@ -5,8 +5,6 @@ use Omnipay\Payture\Message\AbstractRequest;
 class RegisterRequest extends AbstractRequest
 {
 
-
-
     /**
      * Get the raw data array for this message. The format of this varies from gateway to
      * gateway, but will usually be either an associative array, or a SimpleXMLElement.
@@ -16,76 +14,52 @@ class RegisterRequest extends AbstractRequest
     public function getData()
     {
 
+        $params = [
+            'SessionType='.$this->getSessionType(),
+            'OrderId='. $this->getOrderId(),
+            'Amount='.$this->getAmount(),
+            'IP='.$this->getIp()
+        ];
+
+        if($this->getCallbackUrl()){
+            $params[] = 'Url='.$this->getCallbackUrl();
+        }
+        if($this->getTemplateTag()){
+            $params[] = 'TemplateTag='.$this->getTemplateTag();
+        }
+        if($this->getLanguage()){
+            $params[] = 'Language='.$this->getLanguage();
+        }
+        if($this->getProduct()){
+            $params[] = 'Product='.$this->getProduct();
+        }
+        if($this->getTotal()){
+            $params[] = 'Total='.$this->getTotal();
+        }
+        $params = urlencode("Data=" .implode(';',$params));
+
         $data = [
             'Key' => $this->getParameter('Key'),
-            'Data' => $this->getParameter('Data')
+            'Data' => $params
         ];
 
         return $data;
     }
-
+    public function getRequestHeaders()
+    {
+        return array(
+            'Accept' => 'application/x-www-form-urlencoded',
+            'Content-Type' => 'application/x-www-form-urlencoded',
+        );
+    }
 
     public function sendData($data)
     {
-        $objXML = $this->curlTest($data);
+        $client = $this->httpClient->post($this->getUrl(), $this->getRequestHeaders(), $data)->send();
 
+        $resultData = $client->xml();
 
-       /* $reqest = $this->httpClient->post($this->getParameter('url'));
-        $reqest->setBody($data);
-        $response = $reqest->send();*/
-
-        unset($data);
-        if($objXML) {
-           if($objXML['Success'] == "False"){
-               throw new \Exception($objXML['ErrCode']);
-           }
-
-
-           $data['Amount'] = $objXML['Amount'];
-           $data['SessionId'] = $objXML['SessionId'];
-           $data['OrderId'] = $objXML['OrderId'];
-        }else{
-            $data = false;
-        }
-
-
-        $this->response = new RegisterResponse($this, $data);
-
-        return $this->response;
-    }
-
-    /**
-     * @param array $data
-     * @return bool|\SimpleXMLElement
-     */
-    public function curlTest(array $data)
-    {
-        $requestData = "";
-        foreach($data as $key => $value){
-            $requestData .=  $key."=".$value."&";
-        }
-
-
-        if( $curl = curl_init() ) {
-            curl_setopt($curl, CURLOPT_URL, $this->getParameter('url'));
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
-            curl_setopt($curl, CURLOPT_POST, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $requestData);
-            $out = curl_exec($curl);
-
-            if($out !== false) {
-
-                $xml = new \SimpleXMLElement($out);
-
-                curl_close($curl);
-
-                return $xml;
-            }
-            curl_close($curl);
-
-        }
-
-        return false;
+        return $this->response = new RegisterResponse($this, $resultData);
     }
 
 

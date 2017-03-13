@@ -27,7 +27,7 @@ class PaymentResponse extends AbstractResponse  implements RedirectResponseInter
      */
     public function getRedirectMethod()
     {
-        // TODO: Implement getRedirectMethod() method.
+        return 'GET';
     }
 
     /**
@@ -37,7 +37,7 @@ class PaymentResponse extends AbstractResponse  implements RedirectResponseInter
      */
     public function getRedirectData()
     {
-        // TODO: Implement getRedirectData() method.
+        return;
     }
 
     /**
