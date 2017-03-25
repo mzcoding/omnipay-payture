@@ -4,12 +4,19 @@
 namespace Omnipay\Payture\Message;
 
 
-use Omnipay\Common\Message\AbstractRequest;
+use Omnipay\Payture\Message\AbstractRequest;
 use Omnipay\Payture\Message\PayStatusResponse;
-use Omnipay\Common\Message\ResponseInterface;
+
 
 class PayStatusRequest extends AbstractRequest
 {
+    public function getRequestHeaders()
+    {
+        return array(
+            'Accept' => 'application/x-www-form-urlencoded',
+            'Content-Type' => 'application/x-www-form-urlencoded',
+        );
+    }
 
     /**
      * Get the raw data array for this message. The format of this varies from gateway to
@@ -35,36 +42,11 @@ class PayStatusRequest extends AbstractRequest
      */
     public function sendData($data)
     {
-        $resultResponse = $this->curlTest($data);
-        $this->response = new UnblockResponse($this, $resultResponse);
+        $client = $this->httpClient->post($this->getUrl(), $this->getRequestHeaders(), $data)->send();
+        $resultData = $client->xml();
 
-        return $this->response;
+        return $this->response = new PayStatusResponse($this, $resultData);
+
     }
-    /**
-     * @param array $data
-     * @return bool|\SimpleXMLElement
-     */
-    public function curlTest(array $data)
-    {
-        $requestData = "";
-        foreach($data as $key => $value){
-            $requestData .=  $key."=".$value."&";
-        }
 
-
-        if( $curl = curl_init() ) {
-            curl_setopt($curl, CURLOPT_URL, $this->getParameter('url'));
-            curl_setopt($curl, CURLOPT_RETURNTRANSFER,true);
-            curl_setopt($curl, CURLOPT_POST, true);
-            curl_setopt($curl, CURLOPT_POSTFIELDS, $requestData);
-            $out = curl_exec($curl);
-
-
-
-            curl_close($curl);
-            return $out;
-        }
-
-        return false;
-    }
 }
